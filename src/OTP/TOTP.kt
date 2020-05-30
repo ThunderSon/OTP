@@ -9,11 +9,12 @@ import com.google.common.io.BaseEncoding
 import javax.crypto.spec.SecretKeySpec
 import kotlin.math.pow
 
-class TOTP(val secretKey: SecretKey, pwdLength: Int = 6) {
+class TOTP(val secretKey: SecretKey, pwdLength: Int = 6, _hmacAlgorithm: String) {
     val passwordLength: Int = when(pwdLength) {
         in 6..8 -> pwdLength
         else -> 6
     }
+    val hmacAlgorithm: String = if (enumContains<OTP.HmacAlgorithms>(_hmacAlgorithm)) _hmacAlgorithm else { HmacAlgorithms.HmacSHA1.toString() }
 
     private val debutUnixTime = 0
     private var currentUnixTime = { System.currentTimeMillis() / 1000 }
@@ -21,7 +22,7 @@ class TOTP(val secretKey: SecretKey, pwdLength: Int = 6) {
     private var countTimeSteps = (currentUnixTime() - debutUnixTime) / timeStep
 
     private fun hasher(timeStamp: Long): ByteArray {
-        var hashGenerator = Mac.getInstance(HmacAlgorithms.HmacSHA1.toString())
+        var hashGenerator = Mac.getInstance(hmacAlgorithm)
         hashGenerator.init(secretKey)
         return hashGenerator.doFinal(timeStamp.toString().toByteArray())
     }
@@ -49,4 +50,8 @@ enum class HmacAlgorithms() {
     HmacSHA1,
     HmacSHA256,
     HmacSHA512;
+}
+
+inline fun <reified T : Enum<T>> enumContains(algorithm: String): Boolean {
+    return enumValues<T>().any { it.name == algorithm }
 }
