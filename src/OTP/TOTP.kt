@@ -10,14 +10,11 @@ import javax.crypto.spec.SecretKeySpec
 import kotlin.math.pow
 
 class TOTP(val secretKey: SecretKey, pwdLength: Int = 6) {
-    val passwordLength: Int
-
-    init {
-        passwordLength = when(pwdLength) {
-            in 6..8 -> pwdLength
-            else -> 6
-        }
+    val passwordLength: Int = when(pwdLength) {
+        in 6..8 -> pwdLength
+        else -> 6
     }
+
     private val debutUnixTime = 0
     private var currentUnixTime = { System.currentTimeMillis() / 1000 }
     private val timeStep = 30
