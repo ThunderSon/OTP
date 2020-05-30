@@ -12,15 +12,24 @@ fun generateSecretKey(): SecretKey {
 
 fun main () {
     var secretKey: SecretKey? = null
-    println("Do you have a secret? (y/n) -> ")
+    println("Initializing the TOTP generator")
+    print("Do you have a secret? (y/n) -> ")
     when (readLine() ?: false) {
         "y" -> {
-            println("Input the base32 Secret provided to you: ")
+            print("Input the base32 Secret provided to you: ")
             val base32SecretKey = BaseEncoding.base32().decode(readLine())
             secretKey = SecretKeySpec(base32SecretKey, "AES")
         }
         else -> println("A secret will be automatically created for the OTP generation")
     }
     val totp: TOTP = if(secretKey != null) TOTP(secretKey) else TOTP(generateSecretKey())
-    println(totp.generateOTP())
+    while (true) {
+        println("""
+What are you interested in doing? Input the number that represents your action
+1 - GenerateOTP
+""".trimIndent())
+        when(readLine()?.toInt()){
+            1 -> println(totp.generateOTP())
+        }
+    }
 }
