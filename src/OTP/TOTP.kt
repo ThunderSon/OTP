@@ -9,7 +9,7 @@ import com.google.common.io.BaseEncoding
 import javax.crypto.spec.SecretKeySpec
 import kotlin.math.pow
 
-class TOTP(val secretKey: SecretKey, pwdLength: Int = 6, _hmacAlgorithm: String) {
+class TOTP(val secretKey: SecretKey, pwdLength: Int = 6, _hmacAlgorithm: String = HmacAlgorithms.HmacSHA1.toString()) {
     val passwordLength: Int = when(pwdLength) {
         in 6..8 -> pwdLength
         else -> 6
