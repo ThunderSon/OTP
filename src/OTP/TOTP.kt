@@ -24,7 +24,7 @@ class TOTP(val secretKey: SecretKey,
     private val debutUnixTime = 0
     private var currentUnixTime = { System.currentTimeMillis() / 1000 }
     private val timeStep = 30
-    private var countTimeSteps = (currentUnixTime() - debutUnixTime) / timeStep
+    private var countTimeSteps = { (currentUnixTime() - debutUnixTime) / timeStep }
 
     private fun hasher(timeStamp: Long): ByteArray {
         var hashGenerator = Mac.getInstance(hmacAlgorithm)
@@ -43,7 +43,7 @@ class TOTP(val secretKey: SecretKey,
         return binary.int.rem(10.0.pow(passwordLength).toInt()).toString()
     }
 
-    fun generateOTP(timeStamp: Long = countTimeSteps): String {
+    fun generateOTP(timeStamp: Long = countTimeSteps()): String {
         var hash = hasher(timeStamp)
         var otpCode = truncateHash(hash)
         while (passwordLength > otpCode.length) otpCode = "0$otpCode"
