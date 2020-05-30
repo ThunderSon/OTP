@@ -9,9 +9,15 @@ import com.google.common.io.BaseEncoding
 import javax.crypto.spec.SecretKeySpec
 import kotlin.math.pow
 
-const val PASSWORD_LENGTH: Int = 6
+class TOTP(val secretKey: SecretKey, pwdLength: Int = 6) {
+    val passwordLength: Int
 
-class TOTP(val secretKey: SecretKey) {
+    init {
+        passwordLength = when(pwdLength) {
+            in 6..8 -> pwdLength
+            else -> 6
+        }
+    }
     private val debutUnixTime = 0
     private var currentUnixTime = { System.currentTimeMillis() / 1000 }
     private val timeStep = 30
@@ -31,13 +37,13 @@ class TOTP(val secretKey: SecretKey) {
             }
         }
         binary.put(0, binary.get(0).and(0x7F))
-        return binary.int.rem(10.0.pow(PASSWORD_LENGTH).toInt()).toString()
+        return binary.int.rem(10.0.pow(passwordLength).toInt()).toString()
     }
 
     fun generateOTP(timeStamp: Long = countTimeSteps): String {
         var hash = hasher(timeStamp)
         var otpCode = truncateHash(hash)
-        while (PASSWORD_LENGTH > otpCode.length) otpCode = "0$otpCode"
+        while (passwordLength > otpCode.length) otpCode = "0$otpCode"
         return otpCode
     }
 }
