@@ -9,12 +9,17 @@ import com.google.common.io.BaseEncoding
 import javax.crypto.spec.SecretKeySpec
 import kotlin.math.pow
 
-class TOTP(val secretKey: SecretKey, pwdLength: Int = 6, _hmacAlgorithm: String = HmacAlgorithms.HmacSHA1.toString()) {
-    val passwordLength: Int = when(pwdLength) {
-        in 6..8 -> pwdLength
+class TOTP(val secretKey: SecretKey,
+           _passwordLength: Int = 6,
+           _hmacAlgorithm: String = HmacAlgorithms.HmacSHA1.toString()
+) {
+    val passwordLength: Int = when(_passwordLength) {
+        in 6..8 -> _passwordLength
         else -> 6
     }
-    val hmacAlgorithm: String = if (enumContains<OTP.HmacAlgorithms>(_hmacAlgorithm)) _hmacAlgorithm else { HmacAlgorithms.HmacSHA1.toString() }
+    val hmacAlgorithm: String =
+            if (enumContains<OTP.HmacAlgorithms>(_hmacAlgorithm)) _hmacAlgorithm
+            else { HmacAlgorithms.HmacSHA1.toString() }
 
     private val debutUnixTime = 0
     private var currentUnixTime = { System.currentTimeMillis() / 1000 }
