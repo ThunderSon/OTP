@@ -11,13 +11,7 @@ import kotlin.math.pow
 
 const val PASSWORD_LENGTH: Int = 6
 
-fun generateSecretKey(): SecretKey {
-    val keyGenerator = KeyGenerator.getInstance("AES")
-    keyGenerator.init(256)
-    return keyGenerator.generateKey()
-}
-
-class TOTP(val secretKey: SecretKey = generateSecretKey()) {
+class TOTP(val secretKey: SecretKey) {
     private val debutUnixTime = 0
     private var currentUnixTime = { System.currentTimeMillis() / 1000 }
     private val timeStep = 30
@@ -46,21 +40,6 @@ class TOTP(val secretKey: SecretKey = generateSecretKey()) {
         while (PASSWORD_LENGTH > otpCode.length) otpCode = "0$otpCode"
         return otpCode
     }
-}
-
-fun main () {
-    var secretKey: SecretKey? = null
-    println("Do you have a secret? (y/n) -> ")
-    when (readLine() ?: false) {
-        "y" -> {
-            println("Input the base32 Secret provided to you: ")
-            val base32SecretKey = BaseEncoding.base32().decode(readLine())
-            secretKey = SecretKeySpec(base32SecretKey, "AES")
-        }
-        else -> println("A secret will be automatically created for the OTP generation")
-    }
-    val totp: TOTP = if(secretKey != null) TOTP(secretKey) else TOTP()
-    println(totp.generateOTP())
 }
 
 enum class HmacAlgorithms() {
